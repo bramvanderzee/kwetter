@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  userdb:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    volumes:
+      - userdb:/var/lib/mysql
+  userservice:
+    build: ./userservice
+    ports:
+      - '5000:5000'
+    depends_on:
+      - 'userdb'
+    restart: always
+  kweetdb:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    volumes:
+      - kweetdb:/var/lib/mysql
+  kweetservice:
+    build: ./kweetservice
+    ports:
+      - '5000:5000'
+    depends_on:
+      - 'kweetdb'
+    restart: always
+  frontend:
+    build: ./frontend
+    ports:
+      - '80:80'
+
+volumes:
+  db:
