@@ -1,4 +1,4 @@
-# kwetter
+# Kwetter
 kwetter: a school project
 
 ## Services
