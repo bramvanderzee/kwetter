@@ -1,6 +1,18 @@
 version: '3.3'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
   userdb:
     image: mysql:5.7
     restart: always
@@ -13,6 +25,13 @@ services:
       - userdb:/var/lib/mysql
   userservice:
     build: ./userservice
+    ports:
+      - '5003:5000'
+    depends_on:
+      - 'userdb'
+    restart: always
+  authservice:
+    build: ./authservice
     ports:
       - '5001:5000'
     depends_on:
