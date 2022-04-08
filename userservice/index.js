@@ -30,6 +30,13 @@ const User = sequalize.define('user', {
     password: { type: DataTypes.STRING, allowNull: false },
 }, DISABLE_SEQ_DEFAULTS);
 
+function checkExists(id) {
+    return User.count({ where: { id: id } })
+        .then(count => {
+            return count > 0;
+        });
+};
+
 app.use(express.json());
 app.listen(PORT, function() {
     console.log('Connecting to database...');
@@ -38,23 +45,53 @@ app.listen(PORT, function() {
 });
 
 app.get('/user/:id', (req, res, next) => {
-    User.findAll({ where: { id: req.params.id } })
-        .then(users => {
-            if (users.length > 0) {
-                res.send(JSON.stringify(users[0]));
-            } else {
-                res.send('User not found', 404);
-            }
-        });
+    if (checkExists(req.params.id)) {
+        User.findOne({ where: { id: req.params.id } })
+            .then(user => {
+                res.json(user);
+            });
+    } else {
+        res.status(404).send('User not found');
+    }
 });
 
 app.post('/user', (req, res, next) => {
-    User.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
-        })
-        .then(user => {
-            res.send(JSON.stringify(user));
-        });
+    if (checkExists(req.body.id)) {
+        res.status(409).send('User already exists');
+    } else {
+        User.create({
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password
+            })
+            .then(user => {
+                res.send(JSON.stringify(user));
+            });
+    }
+});
+
+app.put('/user/:id', (req, res, next) => {
+    if (checkExists(req.params.id)) {
+        User.update({
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password
+            }, { where: { id: req.params.id } })
+            .then(user => {
+                res.send(JSON.stringify(user));
+            });
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+app.delete('/user/:id', (req, res, next) => {
+    if (checkExists(req.params.id)) {
+        User.destroy({ where: { id: req.params.id } })
+            .then(user => {
+                res.send(JSON.stringify(user));
+            });
+    } else {
+        res.status(404).send('User not found');
+    }
 });
