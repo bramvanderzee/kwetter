@@ -95,3 +95,29 @@ app.delete('/user/:id', (req, res, next) => {
         res.status(404).send('User not found');
     }
 });
+
+app.post('/login', (req, res, next) => {
+    User.findOne({ where: { email: req.body.email } })
+        .then(user => {
+            if (user.password === req.body.password) {
+                res.send(JSON.stringify(user));
+            } else {
+                res.status(401).send('Invalid credentials');
+            }
+        });
+});
+
+app.post('/register', (req, res, next) => {
+    if (checkExists(req.body.id)) {
+        res.status(409).send('User already exists');
+    } else {
+        User.create({
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password
+            })
+            .then(user => {
+                res.send(JSON.stringify(user));
+            });
+    }
+});
