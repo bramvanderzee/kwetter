@@ -6,8 +6,10 @@ name: Node.js CI
 on:
   push:
     paths: 'userservice/*'
+    branches: main
   pull_request:
     paths: 'userservice/*'
+    branches: main
 
 jobs:
   build:
