@@ -1,6 +1,8 @@
 var express = require('express');
 var Sequelize = require('sequelize');
+var amqp = require('amqplib/callback_api');
 var app = express();
+
 const { Op, DataTypes } = Sequelize;
 var PORT = process.env.PORT || 5000;
 var DB_NAME = process.env.DB_NAME || 'userdb';
@@ -8,6 +10,32 @@ var DB_USER = process.env.DB_USER || 'root';
 var DB_PASS = process.env.DB_PASS || 'root';
 var DB_HOST = process.env.DB_HOST || 'userdb';
 var DB_PORT = process.env.DB_PORT || '3305';
+var RABBITMQ_USER = process.env.RABBITMQ_USER || 'guest';
+var RABBITMQ_PASS = process.env.RABBITMQ_PASS || 'guest';
+
+const rabbitmq_opts = { credentials: require('amqplib').credentials.plain(RABBITMQ_USER, RABBITMQ_PASS) };
+
+amqp.connect('amqp://rabbit-mq', rabbitmq_opts, function(error0, connection) {
+    if (error0) {
+        setTimeout(5000);
+    }
+
+    connection.createChannel(function(error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+
+        var queue = 'user';
+        var message = 'Test';
+
+        channel.assertQueue(queue, {
+            durable: false
+        });
+
+        channel.sendToQueue(queue, Buffer.from(message));
+        console.log(" [x] Sent %s", message);
+    });
+});
 
 const DISABLE_SEQ_DEFAULTS = {
     timestamps: true,
@@ -121,3 +149,10 @@ app.post('/register', (req, res, next) => {
             });
     }
 });
+
+process.on('exit', function() {
+    console.log('Closing database connection');
+    sequalize.close();
+    console.log('Closing rabbitmq connection');
+    connection.close();
+})

@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-  rabbitmq:
+  rabbit-mq:
     image: rabbitmq:3-management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: rabbitmq
@@ -32,10 +32,13 @@ services:
       DB_PASS: 'root'
       DB_HOST: 'userdb'
       DB_PORT: '3306'
+      RABBITMQ_USER: 'rabbitmq'
+      RABBITMQ_PASS: 'rabbitmq'
     ports:
       - '5003:5000'
     depends_on:
       - 'userdb'
+      - 'rabbit-mq'
     volumes:
       - ./userservice:/usr/src/app
     restart: always
