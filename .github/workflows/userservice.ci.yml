@@ -5,30 +5,25 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    paths: 'userservice/*'
   pull_request:
-    branches: [ main ]
+    paths: 'userservice/*'
 
 jobs:
   build:
-
+    defaults:
+      run:
+        working-directory: userservice
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 16.x
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 16.x
         cache: 'npm'
+        cache-dependency-path: 'userservice/package-lock.json'
     - run: npm ci
-      working-directory: userservice
     - run: npm run build --if-present
-      working-directory: userservice
     - run: npm test
-      working-directory: userservice
