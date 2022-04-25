@@ -1,5 +1,7 @@
 # frontend
 
+Frontend project for kwetter
+
 ## Project setup
 ```
 npm install
