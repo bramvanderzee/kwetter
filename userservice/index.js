@@ -1,6 +1,6 @@
-var express = require('express');
-var Sequelize = require('sequelize');
-var amqp = require('amqplib/callback_api');
+import express, { json } from 'express';
+import Sequelize from 'sequelize';
+import { connect } from 'amqplib/callback_api';
 var app = express();
 
 const { Op, DataTypes } = Sequelize;
@@ -15,7 +15,7 @@ var RABBITMQ_PASS = process.env.RABBITMQ_PASS || 'guest';
 
 const rabbitmq_opts = { credentials: require('amqplib').credentials.plain(RABBITMQ_USER, RABBITMQ_PASS) };
 
-amqp.connect('amqp://rabbit-mq', rabbitmq_opts, function(error0, connection) {
+connect('amqp://rabbit-mq', rabbitmq_opts, function(error0, connection) {
     if (error0) {
         setTimeout(5000);
     }
@@ -65,7 +65,7 @@ function checkExists(id) {
         });
 };
 
-app.use(express.json());
+app.use(json());
 app.listen(PORT, function() {
     console.log('Connecting to database...');
     User.sync({ alter: true });
