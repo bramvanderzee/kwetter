@@ -34,6 +34,7 @@ services:
       DB_PORT: '3306'
       RABBITMQ_USER: 'rabbitmq'
       RABBITMQ_PASS: 'rabbitmq'
+      RABBITMQ_QUEUENAME: 'user_jobs'
     ports:
       - '5003:5000'
     depends_on:

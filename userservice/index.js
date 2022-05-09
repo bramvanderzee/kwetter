@@ -1,8 +1,8 @@
 import express, { json } from 'express';
 import Sequelize from 'sequelize';
-import { connect } from 'amqplib/callback_api.js';
-import { credentials } from 'amqplib';
 var app = express();
+
+import { rabbitmq_connection, startRabbitMQConnection } from './src/rabbitmq/connection.js';
 
 const { Op, DataTypes } = Sequelize;
 var PORT = process.env.PORT || 5000;
@@ -11,32 +11,10 @@ var DB_USER = process.env.DB_USER || 'root';
 var DB_PASS = process.env.DB_PASS || 'root';
 var DB_HOST = process.env.DB_HOST || 'userdb';
 var DB_PORT = process.env.DB_PORT || '3305';
-var RABBITMQ_USER = process.env.RABBITMQ_USER || 'guest';
-var RABBITMQ_PASS = process.env.RABBITMQ_PASS || 'guest';
 
-const rabbitmq_opts = { credentials: credentials.plain(RABBITMQ_USER, RABBITMQ_PASS) };
-
-connect('amqp://rabbit-mq', rabbitmq_opts, function(error0, connection) {
-    if (error0) {
-        setTimeout(5000);
-    }
-
-    connection.createChannel(function(error1, channel) {
-        if (error1) {
-            throw error1;
-        }
-
-        var queue = 'user';
-        var message = 'Test';
-
-        channel.assertQueue(queue, {
-            durable: false
-        });
-
-        channel.sendToQueue(queue, Buffer.from(message));
-        console.log(" [x] Sent %s", message);
-    });
-});
+var RABBITMQ_USER = process.env.RABBITMQ_USER || 'rabbitmq';
+var RABBITMQ_PASS = process.env.RABBITMQ_PASS || 'rabbitmq';
+var RABBITMQ_QUEUENAME = process.env.RABBITMQ_QUEUENAME || 'user_jobs';
 
 const DISABLE_SEQ_DEFAULTS = {
     timestamps: true,
@@ -70,6 +48,8 @@ app.use(json());
 app.listen(PORT, function() {
     console.log('Connecting to database...');
     User.sync({ alter: true });
+    console.log('Connecting to RabbitMQ...');
+    startRabbitMQConnection(RABBITMQ_USER, RABBITMQ_PASS, RABBITMQ_QUEUENAME);
     console.log('UserService listening on port', PORT);
 });
 
@@ -155,5 +135,5 @@ process.on('exit', function() {
     console.log('Closing database connection');
     sequalize.close();
     console.log('Closing rabbitmq connection');
-    connection.close();
+    rabbitmq_connection.close();
 })
