@@ -38,7 +38,7 @@ export function startRabbitMQWorker(connection, name) {
 }
 
 function work(message, callback) {
-    console.log("[RABBITMQ MESSAGE]:", message.content.toString());
+    console.log("[RABBITMQ WORKER MESSAGE]:", message.content.toString());
     callback(true);
 }
 

@@ -33,14 +33,17 @@ export function startRabbitMQConnection(user, pass, queueName) {
                 throw error1;
             }
 
-            var message = 'Test';
+            var message = 'Testing the user_jobs queue';
 
             channel.assertQueue(queueName, {
                 durable: true
             });
 
-            channel.sendToQueue(queueName, Buffer.from(message));
-            console.log("[RABBITMQ] Sent %s", message, 'to', queueName);
+            setInterval(function() {
+                var dtmessage = message + ' ' + new Date().toISOString();
+                channel.sendToQueue(queueName, Buffer.from(dtmessage));
+                console.log("[RABBITMQ] Sent %s", dtmessage, 'to', queueName);
+            }, 1)
 
             console.log('Starting RabbitMQ worker...');
             startRabbitMQWorker(connection, queueName);

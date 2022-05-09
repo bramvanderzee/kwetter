@@ -4,7 +4,7 @@ var app = express();
 
 import { rabbitmq_connection, startRabbitMQConnection } from './src/rabbitmq/connection.js';
 
-const { Op, DataTypes } = Sequelize;
+const { DataTypes } = Sequelize;
 var PORT = process.env.PORT || 5000;
 var DB_NAME = process.env.DB_NAME || 'userdb';
 var DB_USER = process.env.DB_USER || 'root';
@@ -21,7 +21,7 @@ const DISABLE_SEQ_DEFAULTS = {
     freezeTableName: true,
 }
 
-const sequalize = new Sequelize({
+const sequelize = new Sequelize({
     database: DB_NAME,
     username: DB_USER,
     password: DB_PASS,
@@ -30,7 +30,7 @@ const sequalize = new Sequelize({
     dialect: 'mysql',
 });
 
-const User = sequalize.define('user', {
+const User = sequelize.define('user', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false },
@@ -133,7 +133,7 @@ app.post('/register', (req, res, next) => {
 
 process.on('exit', function() {
     console.log('Closing database connection');
-    sequalize.close();
+    sequelize.close();
     console.log('Closing rabbitmq connection');
     rabbitmq_connection.close();
 })
