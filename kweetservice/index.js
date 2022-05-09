@@ -1,5 +1,5 @@
-var express = require('express');
-var Sequelize = require('sequelize');
+import express, { json } from 'express';
+import Sequelize, { INTEGER, STRING } from 'sequelize';
 var app = express();
 const { Op, DataTypes } = Sequelize;
 var PORT = process.env.PORT || 5000;
@@ -24,9 +24,9 @@ const sequalize = new Sequelize({
 });
 
 const Kweet = sequalize.define('kweet', {
-    id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    content: { type: Sequelize.STRING, allowNull: false },
-    userId: { type: Sequelize.INTEGER, allowNull: false },
+    id: { type: INTEGER, primaryKey: true, autoIncrement: true },
+    content: { type: STRING, allowNull: false },
+    userId: { type: INTEGER, allowNull: false },
 }, DISABLE_SEQ_DEFAULTS);
 
 function checkExists(id) {
@@ -36,7 +36,7 @@ function checkExists(id) {
         });
 };
 
-app.use(express.json());
+app.use(json());
 app.listen(PORT, function() {
     console.log('Connecting to database...');
     Kweet.sync({ alter: true });

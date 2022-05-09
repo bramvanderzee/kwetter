@@ -1,6 +1,7 @@
 import express, { json } from 'express';
 import Sequelize from 'sequelize';
-import { connect } from 'amqplib/callback_api';
+import { connect } from 'amqplib/callback_api.js';
+import { credentials } from 'amqplib';
 var app = express();
 
 const { Op, DataTypes } = Sequelize;
@@ -13,7 +14,7 @@ var DB_PORT = process.env.DB_PORT || '3305';
 var RABBITMQ_USER = process.env.RABBITMQ_USER || 'guest';
 var RABBITMQ_PASS = process.env.RABBITMQ_PASS || 'guest';
 
-const rabbitmq_opts = { credentials: require('amqplib').credentials.plain(RABBITMQ_USER, RABBITMQ_PASS) };
+const rabbitmq_opts = { credentials: credentials.plain(RABBITMQ_USER, RABBITMQ_PASS) };
 
 connect('amqp://rabbit-mq', rabbitmq_opts, function(error0, connection) {
     if (error0) {
