@@ -6,6 +6,7 @@ import { rabbitmq_connection, startRabbitMQConnection } from './src/rabbitmq/con
 
 const { DataTypes } = Sequelize;
 var PORT = process.env.PORT || 5000;
+
 var DB_NAME = process.env.DB_NAME || 'userdb';
 var DB_USER = process.env.DB_USER || 'root';
 var DB_PASS = process.env.DB_PASS || 'root';

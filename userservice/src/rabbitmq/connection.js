@@ -1,6 +1,7 @@
 import { connect } from 'amqplib/callback_api.js';
 import { credentials } from 'amqplib';
 import { startRabbitMQWorker } from './worker.js';
+import { sendRabbitMQMessage } from './publisher.js';
 
 export var rabbitmq_connection = null;
 export var has_connection = false;
@@ -28,26 +29,7 @@ export function startRabbitMQConnection(user, pass, queueName) {
         has_connection = true;
         rabbitmq_connection = connection;
 
-        connection.createChannel(function(error1, channel) {
-            if (error1) {
-                throw error1;
-            }
-
-            var message = 'Testing the user_jobs queue';
-
-            channel.assertQueue(queueName, {
-                durable: true
-            });
-
-            setInterval(function() {
-                var dtmessage = message + ' ' + new Date().toISOString();
-                channel.sendToQueue(queueName, Buffer.from(dtmessage));
-                console.log("[RABBITMQ] Sent %s", dtmessage, 'to', queueName);
-            }, 1)
-
-            console.log('Starting RabbitMQ worker...');
-            startRabbitMQWorker(connection, queueName);
-        });
-
+        startRabbitMQWorker(connection, queueName);
+        sendRabbitMQMessage(connection, queueName, "Test");
     });
 }

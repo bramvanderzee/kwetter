@@ -17,7 +17,7 @@ export function startRabbitMQWorker(connection, name) {
 
         channel.prefetch(10);
         channel.assertQueue(name, { durable: true }, function(err, _ok) {
-            if (closeOnErr(err)) return;
+            if (closeOnError(err)) return;
             channel.consume(name, processMsg, { noAck: false });
             console.log("[RABBITMQ WORKER] Worker on queue", name, "started");
         });
@@ -30,7 +30,7 @@ export function startRabbitMQWorker(connection, name) {
                     else
                         channel.reject(msg, true);
                 } catch (e) {
-                    closeOnErr(e);
+                    closeOnError(e);
                 }
             });
         }
@@ -42,8 +42,8 @@ function work(message, callback) {
     callback(true);
 }
 
-function closeOnErr(err) {
-    if (!err) return false;
-    console.error("[RABBITMQ WORKER ERROR]", err);
+function closeOnError(error) {
+    if (!error) return false;
+    console.error("[RABBITMQ WORKER ERROR]", error);
     return true;
 }
